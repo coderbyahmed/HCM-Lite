@@ -13,6 +13,13 @@ test('default Express export serves the API and restricts credentialed CORS', as
     const address = server.address();
     const baseUrl = `http://127.0.0.1:${address.port}`;
     const allowedOrigin = config.frontendUrls[0];
+    const rootResponse = await fetch(`${baseUrl}/`);
+    assert.equal(rootResponse.status, 200);
+    assert.deepEqual(await rootResponse.json(), {
+      service: 'HCM Lite API',
+      health: '/api/health',
+    });
+
     const allowedResponse = await fetch(`${baseUrl}/api/health`, {
       headers: { Origin: allowedOrigin },
     });

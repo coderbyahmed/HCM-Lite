@@ -33,6 +33,13 @@ export const createApp = () => {
     }
   });
 
+  app.get('/', (req, res) => {
+    res.json({
+      service: 'HCM Lite API',
+      health: '/api/health',
+    });
+  });
+
   // API router
   app.use('/api', apiRouter);
 

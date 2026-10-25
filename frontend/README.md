@@ -30,7 +30,7 @@ Connect the same GitHub repository to both projects and set each project's **Roo
 | Backend | `backend` | Express | Leave the default/override empty; Express is deployed as a Vercel Function | Not applicable |
 | Frontend | `frontend` | Vite | `npm run build` | `dist` |
 
-The backend exports its Express application from `src/app.js`; Vercel serves it as a single Function and the existing `/api/...` route paths remain unchanged. The local `npm start` command is separate and starts the HTTP listener. No custom `vercel.json`, rewrite, or permanently listening process is needed for the backend Vercel project. Keep Vercel's detected Node.js runtime and default install command.
+The backend exports its Express application from `src/app.js`; Vercel serves it as a single Function and the existing `/api/...` route paths remain unchanged. `GET /` returns a small API identity and links to `/api/health`; the backend does not serve the React `/login` page or a favicon. The local `npm start` command is separate and starts the HTTP listener. No custom `vercel.json`, rewrite, or permanently listening process is needed for the backend Vercel project. Keep Vercel's detected Node.js runtime and default install command.
 
 Add these variables in the **Backend** Vercel project's Production environment (and Preview/Development environments as needed):
 
