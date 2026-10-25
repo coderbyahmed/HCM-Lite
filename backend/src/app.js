@@ -12,7 +12,13 @@ export const createApp = () => {
   app.use(
     cors({
       origin: (origin, callback) => {
-        callback(null, !origin || config.frontendUrls.includes(origin));
+        if (!origin || config.frontendUrls.includes(origin)) {
+          return callback(null, true);
+        }
+
+        const error = new Error('Request origin is not allowed by backend CORS configuration.');
+        error.statusCode = 403;
+        return callback(error);
       },
       credentials: true,
     })

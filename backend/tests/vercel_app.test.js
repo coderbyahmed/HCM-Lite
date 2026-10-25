@@ -28,11 +28,27 @@ test('default Express export serves the API and restricts credentialed CORS', as
     assert.equal(allowedResponse.headers.get('access-control-allow-origin'), allowedOrigin);
     assert.equal(allowedResponse.headers.get('access-control-allow-credentials'), 'true');
 
+    const preflightResponse = await fetch(`${baseUrl}/api/auth/login`, {
+      method: 'OPTIONS',
+      headers: {
+        Origin: allowedOrigin,
+        'Access-Control-Request-Method': 'POST',
+        'Access-Control-Request-Headers': 'authorization,content-type',
+      },
+    });
+    assert.equal(preflightResponse.status, 204);
+    assert.equal(preflightResponse.headers.get('access-control-allow-origin'), allowedOrigin);
+    assert.equal(preflightResponse.headers.get('access-control-allow-credentials'), 'true');
+    assert.match(preflightResponse.headers.get('access-control-allow-methods'), /POST/);
+
     const deniedResponse = await fetch(`${baseUrl}/api/health`, {
       headers: { Origin: 'https://untrusted.example' },
     });
-    assert.equal(deniedResponse.status, 200);
+    assert.equal(deniedResponse.status, 403);
     assert.equal(deniedResponse.headers.get('access-control-allow-origin'), null);
+    const deniedBody = await deniedResponse.json();
+    assert.equal(deniedBody.success, false);
+    assert.equal(deniedBody.message, 'Request origin is not allowed by backend CORS configuration.');
   } finally {
     await new Promise((resolve, reject) => {
       server.close((error) => (error ? reject(error) : resolve()));
