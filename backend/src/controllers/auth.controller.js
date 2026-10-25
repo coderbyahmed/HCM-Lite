@@ -52,7 +52,7 @@ export const login = async (req, res, next) => {
     res.cookie('hcm_refresh_token', result.tokens.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -77,7 +77,12 @@ export const refresh = async (req, res, next) => {
 };
 
 export const logout = async (req, res) => {
-  res.clearCookie('hcm_refresh_token');
+  const isProduction = process.env.NODE_ENV === 'production';
+  res.clearCookie('hcm_refresh_token', {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+  });
   res.json({ success: true, message: 'Successfully logged out.' });
 };
 

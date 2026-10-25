@@ -37,21 +37,33 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
   throw new Error('PORT must be an integer between 1 and 65535.');
 }
 
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-let frontendOrigin;
-try {
-  const parsedFrontendUrl = new URL(frontendUrl);
-  if (
-    !['http:', 'https:'].includes(parsedFrontendUrl.protocol) ||
-    parsedFrontendUrl.pathname !== '/' ||
-    parsedFrontendUrl.search ||
-    parsedFrontendUrl.hash
-  ) {
-    throw new Error();
-  }
-  frontendOrigin = parsedFrontendUrl.origin;
-} catch {
-  throw new Error('FRONTEND_URL must be a valid frontend origin without a path.');
+const configuredFrontendUrl = process.env.FRONTEND_URL;
+const frontendUrl = configuredFrontendUrl === undefined
+  ? (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5173')
+  : configuredFrontendUrl;
+const frontendUrls = frontendUrl
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+  .map((origin) => {
+    try {
+      const parsedOrigin = new URL(origin);
+      if (
+        !['http:', 'https:'].includes(parsedOrigin.protocol) ||
+        parsedOrigin.pathname !== '/' ||
+        parsedOrigin.search ||
+        parsedOrigin.hash
+      ) {
+        throw new Error();
+      }
+      return parsedOrigin.origin;
+    } catch {
+      throw new Error('FRONTEND_URL must contain valid frontend origins without paths, separated by commas.');
+    }
+  });
+
+if (!frontendUrls.length) {
+  throw new Error('FRONTEND_URL is required in production and must contain at least one frontend origin.');
 }
 
 export const config = {
@@ -59,7 +71,7 @@ export const config = {
   port,
   mongodbUri,
   mongodbDatabaseName: configuredDatabaseName || uriDatabaseName,
-  frontendUrl: frontendOrigin,
+  frontendUrls: [...new Set(frontendUrls)],
   jwt: {
     accessSecret: process.env.JWT_ACCESS_SECRET || '',
     refreshSecret: process.env.JWT_REFRESH_SECRET || '',
