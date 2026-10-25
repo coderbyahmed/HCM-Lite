@@ -1,0 +1,28 @@
+{
+  "name": "hcm-lite-backend",
+  "version": "1.0.0",
+  "description": "Production-grade backend for HCM Lite human capital management system",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --import ./tests/test-env.js --test tests/*.test.js"
+  },
+  "dependencies": {
+    "@google/genai": "^2.4.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "csv-parse": "^6.1.1",
+    "csv-stringify": "^6.6.3",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "geolib": "^3.3.4",
+    "jsonwebtoken": "^9.0.3",
+    "jszip": "^3.10.1",
+    "mongoose": "^9.3.2",
+    "zod": "^4.3.6"
+  }
+}
